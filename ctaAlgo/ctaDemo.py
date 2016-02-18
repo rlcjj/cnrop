@@ -24,9 +24,9 @@ class DoubleEmaDemo(CtaTemplate):
     author = u'用Python的交易员'
 
     # 策略参数
-    fastK = 0.9  # 快速EMA参数
+    fastK = 0.2  # 快速EMA参数
     slowK = 0.1  # 慢速EMA参数
-    initDays = 10  # 初始化数据所用的天数
+    initDays = 3  # 初始化数据所用的天数
 
     # 策略变量
     bar = None
@@ -91,6 +91,7 @@ class DoubleEmaDemo(CtaTemplate):
         # 计算K线
         tickMinute = tick.datetime.minute
 
+
         if tickMinute != self.barMinute:
             if self.bar:
                 self.onBar(self.bar)
@@ -147,12 +148,13 @@ class DoubleEmaDemo(CtaTemplate):
         crossOver = self.fastMa0 > self.slowMa0 and self.fastMa1 < self.slowMa1  # 金叉上穿
         crossBelow = self.fastMa0 < self.slowMa0 and self.fastMa1 > self.slowMa1  # 死叉下穿
 
+
         # 金叉和死叉的条件是互斥
         # 所有的委托均以K线收盘价委托（这里有一个实盘中无法成交的风险，考虑添加对模拟市价单类型的支持）
         if crossOver:
             # 如果金叉时手头没有持仓，则直接做多
             if self.pos == 0:
-                self.buy(bar.close, 1)
+                self.buy(bar.close - 10.0, 1)
             # 如果有空头持仓，则先平空，再做多
             elif self.pos < 0:
                 self.cover(bar.close, 1)
@@ -160,11 +162,17 @@ class DoubleEmaDemo(CtaTemplate):
         # 死叉和金叉相反
         elif crossBelow:
             if self.pos == 0:
-                self.short(bar.close, 1)
+                self.short(bar.close + 10.0, 1)
             elif self.pos > 0:
                 self.sell(bar.close, 1)
                 self.short(bar.close, 1)
 
+        # #  3s 不成交即撤单
+        # if self.order.status=='3':
+        #     self.cancelOrder(self)
+
+        # if  3==3:
+        #     self.buy(bar.close-10.0,1)
         # 发出状态更新事件
         self.putEvent()
 
@@ -172,10 +180,16 @@ class DoubleEmaDemo(CtaTemplate):
     def onOrder(self, order):
         """收到委托变化推送（必须由用户继承实现）"""
         # 对于无需做细粒度委托控制的策略，可以忽略onOrder
-        pass
+
+        if order.status == u'未成交':
+            self.cancelOrder(order.vtOrderID)
+            print '撤单成功'
+
+            # pass
 
     # ----------------------------------------------------------------------
     def onTrade(self, trade):
         """收到成交推送（必须由用户继承实现）"""
         # 对于无需做细粒度委托控制的策略，可以忽略onOrder
+
         pass

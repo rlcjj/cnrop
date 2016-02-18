@@ -124,12 +124,15 @@ class CtaTemplate(object):
 
             # ----------------------------------------------------------------------
 
-    def cancelOrder(self, orderID):
+    def cancelOrder(self, vtOrderID):
         """撤单"""
-        if STOPORDERPREFIX in orderID:
-            self.ctaEngine.cancelStopOrder(orderID)
+        if STOPORDERPREFIX in vtOrderID:
+            self.ctaEngine.cancelStopOrder(vtOrderID)
         else:
-            self.ctaEngine.cancelOrder(orderID)
+            self.ctaEngine.cancelOrder(vtOrderID)
+            print 'order', vtOrderID
+
+
 
     # ----------------------------------------------------------------------
     def insertTick(self, tick):

@@ -184,6 +184,7 @@ class VtTickData(VtBaseData):
 
         self.upperLimit = EMPTY_FLOAT  # 涨停价
         self.lowerLimit = EMPTY_FLOAT  # 跌停价
+        # self.priceTick = EMPTY_FLOAT
 
         # 五档行情
         self.bidPrice1 = EMPTY_FLOAT
