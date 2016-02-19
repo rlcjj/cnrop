@@ -166,11 +166,7 @@ class DoubleEmaDemo(CtaTemplate):
             elif self.pos > 0:
                 self.sell(bar.close, 1)
                 self.short(bar.close, 1)
-
-        # #  3s 不成交即撤单
-        # if self.order.status=='3':
-        #     self.cancelOrder(self)
-
+                
         # if  3==3:
         #     self.buy(bar.close-10.0,1)
         # 发出状态更新事件
