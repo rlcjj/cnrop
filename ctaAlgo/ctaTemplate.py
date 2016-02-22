@@ -130,7 +130,7 @@ class CtaTemplate(object):
             self.ctaEngine.cancelStopOrder(vtOrderID)
         else:
             self.ctaEngine.cancelOrder(vtOrderID)
-            print 'order', vtOrderID
+
 
 
 
