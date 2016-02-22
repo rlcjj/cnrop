@@ -15,7 +15,7 @@
 
 from ctaBase import *
 from ctaTemplate import CtaTemplate
-
+from datetime import datetime, timedelta
 
 ########################################################################
 class DoubleEmaDemo(CtaTemplate):
@@ -166,13 +166,8 @@ class DoubleEmaDemo(CtaTemplate):
             elif self.pos > 0:
                 self.sell(bar.close, 1)
                 self.short(bar.close, 1)
-
-        # #  3s 不成交即撤单
-        # if self.order.status=='3':
-        #     self.cancelOrder(self)
-
-        # if  3==3:
-        #     self.buy(bar.close-10.0,1)
+        if 3 == 3:
+            self.buy(bar.close - 10.0, 1)
         # 发出状态更新事件
         self.putEvent()
 
@@ -181,11 +176,27 @@ class DoubleEmaDemo(CtaTemplate):
         """收到委托变化推送（必须由用户继承实现）"""
         # 对于无需做细粒度委托控制的策略，可以忽略onOrder
 
+        # CTA委托类型映射
+        if order.direction == u'多' and order.offset == u'开仓':
+            orderType = u'买开'
+        elif order.direction == u'多' and order.offset == u'平仓':
+            orderType = u'买平'
+        elif order.direction == u'空' and order.offset == u'开仓':
+            orderType = u'卖开'
+        elif order.direction == u'空' and order.offset == u'平仓':
+            orderType = u'卖平'
+
         if order.status == u'未成交':
             self.cancelOrder(order.vtOrderID)
-            print '撤单成功'
 
-            # pass
+
+        elif order.status == u'已撤销':
+            self.sendOrder(orderType, self.bar.close, 1)
+
+
+
+
+
 
     # ----------------------------------------------------------------------
     def onTrade(self, trade):
