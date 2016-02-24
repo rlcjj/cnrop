@@ -62,6 +62,10 @@ class DoubleEmaDemo(CtaTemplate):
         """Constructor"""
         super(DoubleEmaDemo, self).__init__(ctaEngine, setting)
 
+        self.lastOrder = None
+        self.orderType = ''
+
+
     # ----------------------------------------------------------------------
     def onInit(self):
         """初始化策略（必须由用户继承实现）"""
@@ -124,6 +128,22 @@ class DoubleEmaDemo(CtaTemplate):
             bar.low = min(bar.low, tick.lastPrice)
             bar.close = tick.lastPrice
 
+        # CTA委托类型映射
+        if self.lastOrder != None and self.lastOrder.direction == u'多' and self.lastOrder.offset == u'开仓':
+            self.orderType = u'买开'
+        elif self.lastOrder != None and self.lastOrder.direction == u'多' and self.lastOrder.offset == u'平仓':
+            self.orderType = u'买平'
+        elif self.lastOrder != None and self.lastOrder.direction == u'空' and self.lastOrder.offset == u'开仓':
+            self.orderType = u'卖开'
+        elif self.lastOrder != None and self.lastOrder.direction == u'空' and self.lastOrder.offset == u'平仓':
+            self.orderType = u'卖平'
+
+        if self.lastOrder != None and self.lastOrder.status == u'未成交':
+            self.cancelOrder(self.lastOrder.vtOrderID)
+
+        elif self.lastOrder != None and self.lastOrder.status == u'已撤销':
+
+            self.sendOrder(self.orderType, self.bar.close - 10, 1)
     # ----------------------------------------------------------------------
     def onBar(self, bar):
         """收到Bar推送（必须由用户继承实现）"""
@@ -151,23 +171,25 @@ class DoubleEmaDemo(CtaTemplate):
 
         # 金叉和死叉的条件是互斥
         # 所有的委托均以K线收盘价委托（这里有一个实盘中无法成交的风险，考虑添加对模拟市价单类型的支持）
-        if crossOver:
-            # 如果金叉时手头没有持仓，则直接做多
-            if self.pos == 0:
-                self.buy(bar.close - 10.0, 1)
-            # 如果有空头持仓，则先平空，再做多
-            elif self.pos < 0:
-                self.cover(bar.close, 1)
-                self.buy(bar.close, 1)
-        # 死叉和金叉相反
-        elif crossBelow:
-            if self.pos == 0:
-                self.short(bar.close + 10.0, 1)
-            elif self.pos > 0:
-                self.sell(bar.close, 1)
-                self.short(bar.close, 1)
+        # if crossOver:
+        #     # 如果金叉时手头没有持仓，则直接做多
+        #     if self.pos == 0:
+        #         self.buy(bar.close - 10.0, 1)
+        #     # 如果有空头持仓，则先平空，再做多
+        #     elif self.pos < 0:
+        #         self.cover(bar.close, 1)
+        #         self.buy(bar.close, 1)
+        # # 死叉和金叉相反
+        # elif crossBelow:
+        #     if self.pos == 0:
+        #         self.short(bar.close + 10.0, 1)
+        #     elif self.pos > 0:
+        #         self.sell(bar.close, 1)
+        #         self.short(bar.close, 1)
+
         if 3 == 3:
             self.buy(bar.close - 10.0, 1)
+
         # 发出状态更新事件
         self.putEvent()
 
@@ -176,24 +198,8 @@ class DoubleEmaDemo(CtaTemplate):
         """收到委托变化推送（必须由用户继承实现）"""
         # 对于无需做细粒度委托控制的策略，可以忽略onOrder
 
-        # CTA委托类型映射
-        if order.direction == u'多' and order.offset == u'开仓':
-            orderType = u'买开'
-        elif order.direction == u'多' and order.offset == u'平仓':
-            orderType = u'买平'
-        elif order.direction == u'空' and order.offset == u'开仓':
-            orderType = u'卖开'
-        elif order.direction == u'空' and order.offset == u'平仓':
-            orderType = u'卖平'
 
-        if order.status == u'未成交':
-            self.cancelOrder(order.vtOrderID)
-
-
-        elif order.status == u'已撤销':
-            self.sendOrder(orderType, self.bar.close, 1)
-
-
+        self.lastOrder = order
 
 
 
