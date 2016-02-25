@@ -2,11 +2,6 @@
   {
     "name": "double ema",
     "className": "DoubleEmaDemo",
-    "vtSymbol": "IF1602"
-  },
-  {
-    "name": "DataRecorder",
-    "className": "DataRecorder",
-    "vtSymbol": "IF1602"
+    "vtSymbol": "rb1605"
   }
 ]
