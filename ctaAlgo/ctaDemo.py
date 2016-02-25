@@ -131,19 +131,25 @@ class DoubleEmaDemo(CtaTemplate):
         # CTA委托类型映射
         if self.lastOrder != None and self.lastOrder.direction == u'多' and self.lastOrder.offset == u'开仓':
             self.orderType = u'买开'
+
         elif self.lastOrder != None and self.lastOrder.direction == u'多' and self.lastOrder.offset == u'平仓':
             self.orderType = u'买平'
+
         elif self.lastOrder != None and self.lastOrder.direction == u'空' and self.lastOrder.offset == u'开仓':
             self.orderType = u'卖开'
+
         elif self.lastOrder != None and self.lastOrder.direction == u'空' and self.lastOrder.offset == u'平仓':
             self.orderType = u'卖平'
 
         if self.lastOrder != None and self.lastOrder.status == u'未成交':
+
             self.cancelOrder(self.lastOrder.vtOrderID)
+            self.lastOrder = None
 
         elif self.lastOrder != None and self.lastOrder.status == u'已撤销':
 
             self.sendOrder(self.orderType, self.bar.close - 10, 1)
+            self.lastOrder = None
     # ----------------------------------------------------------------------
     def onBar(self, bar):
         """收到Bar推送（必须由用户继承实现）"""
@@ -187,7 +193,7 @@ class DoubleEmaDemo(CtaTemplate):
         #         self.sell(bar.close, 1)
         #         self.short(bar.close, 1)
 
-        if 3 == 3:
+        if self.lastOrder == None:
             self.buy(bar.close - 10.0, 1)
 
         # 发出状态更新事件
@@ -198,10 +204,10 @@ class DoubleEmaDemo(CtaTemplate):
         """收到委托变化推送（必须由用户继承实现）"""
         # 对于无需做细粒度委托控制的策略，可以忽略onOrder
 
-
         self.lastOrder = order
+        self.writeCtaLog(self.lastOrder.vtOrderID + self.lastOrder.status + u'回调')
 
-
+        print self.lastOrder.vtOrderID + self.lastOrder.status + u'回调', datetime.now()
 
 
     # ----------------------------------------------------------------------
