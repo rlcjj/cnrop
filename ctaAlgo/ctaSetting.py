@@ -9,8 +9,9 @@
 '''
 
 from ctaTemplate import DataRecorder
-from ctaDemo import DoubleEmaDemo
+from ctaDemo import DoubleEmaDemo, TalibDoubleSmaDemo
 
 STRATEGY_CLASS = {}
 STRATEGY_CLASS['DataRecorder'] = DataRecorder
 STRATEGY_CLASS['DoubleEmaDemo'] = DoubleEmaDemo
+STRATEGY_CLASS['TalibDoubleSmaDemo'] = TalibDoubleSmaDemo

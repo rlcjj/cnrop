@@ -1,7 +1,7 @@
 [
   {
-    "name": "double ema",
-    "className": "DoubleEmaDemo",
+    "name": "Talib DoubleSma",
+    "className": "TalibDoubleSmaDemo",
     "vtSymbol": "rb1605"
   }
 ]
